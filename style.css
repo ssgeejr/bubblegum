@@ -1,0 +1,93 @@
+:root {
+  --box-size: 80px;
+  --box-margin: 20px;
+  --columns: 8;
+}
+
+body {
+  font-family: sans-serif;
+  margin: 30px;
+  background: #f2f2f2;
+}
+
+h1 {
+  font-size: 24px;
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.search-bar input[type="text"] {
+  padding: 8px;
+  width: 200px;
+}
+
+.search-bar button {
+  padding: 8px 12px;
+}
+
+.bookmarks {
+  display: grid;
+  grid-template-columns: repeat(var(--columns), 1fr);
+  gap: var(--box-margin);
+  margin-top: 30px;
+}
+
+.bookmark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.bookmark-box {
+  width: var(--box-size);
+  height: var(--box-size);
+  background: #ffffff;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-sizing: border-box;
+}
+
+.bookmark-box:hover {
+  background: #e6f7ff;
+}
+
+.bookmark-box img {
+  max-width: 32px;
+  max-height: 32px;
+}
+
+.bookmark-name {
+  margin-top: 5px;
+  font-size: 14px;
+  text-align: center;
+  width: 100%;
+  max-width: 100px;
+  word-wrap: break-word;
+}
+
+.add-form {
+  margin-top: 40px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.add-form input[type="text"] {
+  padding: 6px;
+  width: 200px;
+}
+
+.add-form button {
+  padding: 6px 10px;
+}

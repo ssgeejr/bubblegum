@@ -1,0 +1,10 @@
+services:
+  favicon:
+    build: ./favicon-service
+    container_name: favicon-service
+    ports:
+      - "80:5000"
+    volumes:
+      - ./favicon-service/favicons:/app/favicons
+    restart: unless-stopped
+
