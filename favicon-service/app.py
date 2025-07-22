@@ -36,7 +36,7 @@ def get_favicon(domain):
     if try_download(default_favicon, filename):
         return send_file(filename)
 
-    # 2. If that fails, parse HTML to find icon tags
+    # 2. Parse HTML for <link rel="icon">
     try:
         html = requests.get(base_url, headers=HEADERS, timeout=5).text
         soup = BeautifulSoup(html, "html.parser")
@@ -50,5 +50,10 @@ def get_favicon(domain):
                     return send_file(filename)
     except Exception:
         pass
+
+    # 3. Fallback to DuckDuckGo's shared CDN
+    fallback_url = f"https://icons.duckduckgo.com/ip3/{domain}.ico"
+    if try_download(fallback_url, filename):
+        return send_file(filename)
 
     abort(404, description="Favicon not found")
