@@ -91,3 +91,17 @@ h1 {
 .add-form button {
   padding: 6px 10px;
 }
+
+
+.delete-button {
+  background: transparent;
+  border: none;
+  color: red;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.delete-button:hover {
+  color: darkred;
+}
