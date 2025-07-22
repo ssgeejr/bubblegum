@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bubble Gum</title>
+  <style>
+    :root {
+      --box-size: 80px;
+      --box-margin: 20px;
+      --columns: 8;
+    }
+
+    body {
+      font-family: sans-serif;
+      margin: 30px;
+      background: #f2f2f2;
+    }
+
+    h1 {
+      font-size: 24px;
+    }
+
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .search-bar input[type="text"] {
+      padding: 8px;
+      width: 200px;
+    }
+
+    .search-bar button {
+      padding: 8px 12px;
+    }
+
+    .bookmarks {
+      display: grid;
+      grid-template-columns: repeat(var(--columns), 1fr);
+      gap: var(--box-margin);
+      margin-top: 30px;
+    }
+
+    .bookmark {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+    }
+
+    .bookmark-box {
+      width: var(--box-size);
+      height: var(--box-size);
+      background: #ffffff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+      box-sizing: border-box;
+    }
+
+    .bookmark-box:hover {
+      background: #e6f7ff;
+    }
+
+    .bookmark-name {
+      margin-top: 5px;
+      font-size: 14px;
+      text-align: center;
+      width: 100%;
+      max-width: 100px;
+      word-wrap: break-word;
+    }
+
+    .add-form {
+      margin-top: 40px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .add-form input[type="text"] {
+      padding: 6px;
+      width: 200px;
+    }
+
+    .add-form button {
+      padding: 6px 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🔎 Search Tools</h1>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Enter search term">
+    <button onclick="search('google')">Google</button>
+    <button onclick="search('videos')">Google Videos</button>
+    <button onclick="search('custom')">Custom</button>
+  </div>
+
+  <h1>🔖 Bookmarks</h1>
+  <div class="bookmarks" id="bookmarkGrid"></div>
+
+  <div class="add-form">
+    <input type="text" id="bookmarkName" placeholder="Name">
+    <input type="text" id="bookmarkURL" placeholder="https://example.com">
+    <button onclick="addBookmark()">Add Bookmark</button>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "localBookmarks";
+    const columns = 8; // You can change this number to alter layout
+    document.documentElement.style.setProperty('--columns', columns);
+
+    function loadBookmarks() {
+      const grid = document.getElementById("bookmarkGrid");
+      grid.innerHTML = "";
+
+      let bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+      bookmarks.forEach(({ name, url }) => {
+        const container = document.createElement("div");
+        container.className = "bookmark";
+
+        const box = document.createElement("div");
+        box.className = "bookmark-box";
+        box.onclick = () => window.open(url, "_blank");
+        box.textContent = "🔗";
+
+        const label = document.createElement("div");
+        label.className = "bookmark-name";
+        label.textContent = name;
+
+        container.appendChild(box);
+        container.appendChild(label);
+        grid.appendChild(container);
+      });
+    }
+
+    function addBookmark() {
+      const name = document.getElementById("bookmarkName").value.trim();
+      const url = document.getElementById("bookmarkURL").value.trim();
+
+      if (!name || !url) {
+        alert("Both fields required");
+        return;
+      }
+
+      let bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      bookmarks.push({ name, url });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
+
+      document.getElementById("bookmarkName").value = "";
+      document.getElementById("bookmarkURL").value = "";
+
+      loadBookmarks();
+    }
+
+    function search(engine) {
+      const term = document.getElementById("searchInput").value.trim();
+      if (!term) return;
+
+      let url = "";
+      switch (engine) {
+        case 'google':
+          url = `https://www.google.com/search?q=${encodeURIComponent(term)}`;
+          break;
+        case 'videos':
+          url = `https://www.google.com/search?tbm=vid&q=${encodeURIComponent(term)}`;
+          break;
+        case 'custom':
+          url = `https://www.youtube.com/gaming/search?q=${encodeURIComponent(term)}`;
+          break;
+      }
+
+      window.open(url, "_blank");
+    }
+
+    window.onload = loadBookmarks;
+  </script>
+
+</body>
+</html>
