@@ -24,119 +24,120 @@
     <button onclick="addBookmark()">Add Bookmark</button>
   </div>
 
-<script>
-  const STORAGE_KEY = "localBookmarks";
-  const columns = 8;
-  document.documentElement.style.setProperty('--columns', columns);
+  <script>
+    const STORAGE_KEY = "localBookmarks";
+    const columns = 8;
+    document.documentElement.style.setProperty('--columns', columns);
 
-  function loadBookmarks() {
-    const grid = document.getElementById("bookmarkGrid");
-    grid.innerHTML = "";
+    function loadBookmarks() {
+      const grid = document.getElementById("bookmarkGrid");
+      grid.innerHTML = "";
 
-    let bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      const bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-    bookmarks.forEach(({ name, url }) => {
-      let domain = "";
-      try {
-        domain = new URL(url).hostname;
-      } catch (e) {
-        console.warn("Invalid URL skipped:", url);
+      bookmarks.forEach(({ name, url }) => {
+        let domain = "";
+        try {
+          domain = new URL(url).hostname;
+        } catch (e) {
+          console.warn("Invalid URL skipped:", url);
+          return;
+        }
+
+        const container = document.createElement("div");
+        container.className = "bookmark";
+
+        const box = document.createElement("div");
+        box.className = "bookmark-box";
+        box.onclick = () => {
+          window.location.href = url; // open in same tab
+        };
+
+        const img = document.createElement("img");
+        img.src = `http://wintermute/favicon/${domain}`;
+        img.alt = name;
+        img.width = 32;
+        img.height = 32;
+        box.appendChild(img);
+
+        const label = document.createElement("div");
+        label.className = "bookmark-name";
+        label.textContent = name;
+
+        const del = document.createElement("button");
+        del.className = "delete-button";
+        del.textContent = "✖";
+        del.title = "Delete this bookmark";
+        del.onclick = (e) => {
+          e.stopPropagation();
+          deleteBookmark(url);
+        };
+
+        container.appendChild(box);
+        container.appendChild(label);
+        container.appendChild(del);
+        grid.appendChild(container);
+      });
+    }
+
+    function deleteBookmark(urlToDelete) {
+      const bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      const updated = bookmarks.filter(({ url }) => url !== urlToDelete);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      loadBookmarks();
+    }
+
+    function addBookmark() {
+      const name = document.getElementById("bookmarkName").value.trim();
+      let url = document.getElementById("bookmarkURL").value.trim();
+
+      if (!name || !url) {
+        alert("Both fields required");
         return;
       }
 
-      const container = document.createElement("div");
-      container.className = "bookmark";
+      if (!/^https?:\/\//i.test(url)) {
+        url = "https://" + url;
+      }
 
-      const box = document.createElement("div");
-      box.className = "bookmark-box";
-      box.onclick = () => window.open(url, "_blank");
+      const bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-      const img = document.createElement("img");
-      img.src = `http://wintermute/favicon/${domain}`;
-      img.alt = name;
-      img.width = 32;
-      img.height = 32;
-      box.appendChild(img);
+      if (bookmarks.some(b => b.url === url)) {
+        alert("Bookmark already exists.");
+        return;
+      }
 
-      const label = document.createElement("div");
-      label.className = "bookmark-name";
-      label.textContent = name;
+      bookmarks.push({ name, url });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
 
-      const del = document.createElement("button");
-      del.className = "delete-button";
-      del.textContent = "✖";
-      del.title = "Delete this bookmark";
-      del.onclick = (e) => {
-        e.stopPropagation(); // prevent link open
-        deleteBookmark(url);
-      };
+      document.getElementById("bookmarkName").value = "";
+      document.getElementById("bookmarkURL").value = "";
 
-      container.appendChild(box);
-      container.appendChild(label);
-      container.appendChild(del);
-      grid.appendChild(container);
-    });
-  }
-
-  function deleteBookmark(urlToDelete) {
-    let bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    const updated = bookmarks.filter(({ url }) => url !== urlToDelete);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    loadBookmarks();
-  }
-
-  function addBookmark() {
-    const name = document.getElementById("bookmarkName").value.trim();
-    let url = document.getElementById("bookmarkURL").value.trim();
-
-    if (!name || !url) {
-      alert("Both fields required");
-      return;
+      loadBookmarks();
     }
 
-    if (!/^https?:\/\//i.test(url)) {
-      url = "https://" + url;
+    function search(engine) {
+      const term = document.getElementById("searchInput").value.trim();
+      if (!term) return;
+
+      let url = "";
+      switch (engine) {
+        case 'google':
+          url = `https://www.google.com/search?q=${encodeURIComponent(term)}`;
+          break;
+        case 'videos':
+          url = `https://www.google.com/search?tbm=vid&q=${encodeURIComponent(term)}`;
+          break;
+        case 'custom':
+          url = `https://www.google.com/search?tbm=vid&q=${encodeURIComponent(term + " gameplay")}`;
+          break;
+      }
+
+      window.location.href = url;
+
     }
 
-    let bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-    // Prevent duplicates by URL
-    if (bookmarks.some(b => b.url === url)) {
-      alert("Bookmark already exists.");
-      return;
-    }
-
-    bookmarks.push({ name, url });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
-
-    document.getElementById("bookmarkName").value = "";
-    document.getElementById("bookmarkURL").value = "";
-
-    loadBookmarks();
-  }
-
-  function search(engine) {
-    const term = document.getElementById("searchInput").value.trim();
-    if (!term) return;
-
-    let url = "";
-    switch (engine) {
-      case 'google':
-        url = `https://www.google.com/search?q=${encodeURIComponent(term)}`;
-        break;
-      case 'videos':
-        url = `https://www.google.com/search?tbm=vid&q=${encodeURIComponent(term)}`;
-        break;
-      case 'custom':
-        url = `https://www.youtube.com/gaming/search?q=${encodeURIComponent(term)}`;
-        break;
-    }
-
-    window.open(url, "_blank");
-  }
-
-  window.onload = loadBookmarks;
-</script>
-
+    window.onload = loadBookmarks;
+  </script>
 </body>
 </html>
